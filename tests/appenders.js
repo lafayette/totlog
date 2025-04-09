@@ -34,6 +34,36 @@ describe('appenders', function () {
       requestApi.end.should.be.called()
     })
   })
+  describe('telegram', function () {
+    let request, requestApi, telegram
+    beforeEach(function () {
+      requestApi = { on: sinon.spy(), write: sinon.spy(), end: sinon.spy() }
+      request = sinon.spy(() => requestApi)
+      mockRequire('https', { request })
+      telegram = mockRequire.reRequire('../appenders').telegram
+    })
+    afterEach(function () {
+      mockRequire.stopAll()
+    })
+    it('should send messages', function () {
+      const botToken = '123:chpoken'
+      const instance = telegram({ botToken, chatId: 'ololo' })
+      instance({ time: '1', level: 'error', category: '2', message: '3' })
+      request.should.be.calledWith({
+        hostname: 'api.telegram.org',
+        path: `/bot${botToken}/sendMessage`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': 48,
+        },
+      })
+      requestApi.on.should.be.calledWith('error')
+      const expectedPayload = JSON.stringify({ chat_id: 'ololo', text: '*1* `2` ```\n3\n```' })
+      requestApi.write.should.be.calledWith(expectedPayload)
+      requestApi.end.should.be.called()
+    })
+  })
   describe('logstash', function () {
     let socket, logstash
     beforeEach(function () {

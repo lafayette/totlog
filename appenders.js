@@ -5,7 +5,7 @@ const net = require('net')
 
 const log = require('./')(__filename, true)
 
-module.exports = { slack, logstash }
+module.exports = { slack, telegram, logstash }
 
 function slack ({ token, channel, icon }) {
   if (!token) {
@@ -40,7 +40,7 @@ function slack ({ token, channel, icon }) {
     request.end()
 
     function handleResponse (response) {
-      if (response.statusCode != 200) {
+      if (response.statusCode !== 200) {
         handlError(new Error(String(response.statusCode)))
       }
       response.on('error', handlError)
@@ -48,6 +48,48 @@ function slack ({ token, channel, icon }) {
 
     function handlError (error) {
       log.error(`failed to send message to slack due to ${error.stack}`)
+    }
+  }
+}
+
+function telegram ({ botToken, chatId }) {
+  if (!botToken) {
+    throw new Error('botToken is required.')
+  }
+
+  if (!chatId) {
+    throw new Error('chatId is required.')
+  }
+
+  return function (ev) {
+    const payload = JSON.stringify({
+      chat_id: chatId,
+      text: `*${ev.time}* ${'`'}${ev.category}${'`'} ${'```\n'}${ev.message}${'\n```'}`,
+    })
+
+    const request = https.request({
+      hostname: 'api.telegram.org',
+      path: `/bot${botToken}/sendMessage`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    }, handleResponse)
+
+    request.on('error', handlError)
+    request.write(payload)
+    request.end()
+
+    function handleResponse (response) {
+      if (response.statusCode !== 200) {
+        handlError(new Error(String(response.statusCode)))
+      }
+      response.on('error', handlError)
+    }
+
+    function handlError (error) {
+      log.error(`failed to send message to telegram due to ${error.stack}`)
     }
   }
 }
