@@ -2,6 +2,7 @@ const https = require('https')
 const querystring = require('querystring')
 const dgram = require('dgram')
 const net = require('net')
+const truncate = require('lodash/truncate')
 
 const log = require('./')(__filename, true)
 
@@ -62,9 +63,13 @@ function telegram ({ botToken, chatId }) {
   }
 
   return function (ev) {
+    const truncatedMessage = truncate(ev.message, {
+      length: process.env.MAX_MESSAGE_LENGTH || 700,
+      omission: ' ...',
+    })
     const payload = JSON.stringify({
       chat_id: chatId,
-      text: `*${ev.time}* ${'`'}${ev.category}${'`'} ${'```\n'}${ev.message}${'\n```'}`,
+      text: `*${ev.time}* ${'`'}${ev.category}${'`'} ${'```\n'}${truncatedMessage}${'\n```'}`,
     })
 
     const request = https.request({
