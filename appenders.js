@@ -129,7 +129,7 @@ function logstash ({ url }) {
       })
     }
 
-    const buffer = Buffer.from(JSON.stringify(ev))
+    const buffer = new Buffer(JSON.stringify(ev) + '\n')
     udpSocket.send(buffer, 0, buffer.length, port, host, error => {
       if (!error) {
         return
@@ -149,7 +149,7 @@ function logstash ({ url }) {
       })
     }
 
-    const buffer = Buffer.from(JSON.stringify(ev) + '\n')
+    const buffer = new Buffer(JSON.stringify(ev) + '\n')
     tcpSocket.write(buffer, error => {
       if (!error) {
         return
