@@ -2,8 +2,8 @@
 
 The only true log: (almost) zero dependencies, categories, colors, events for flexible support of additional appending logic. Bonus: slack, telegram, mattermost and logstash appenders. Extra bonus: (almost) everything is tested.
 
-[![Build Status](https://travis-ci.org/titarenko/totlog.svg?branch=master)](https://travis-ci.org/titarenko/totlog)
-[![Coverage Status](https://coveralls.io/repos/github/titarenko/totlog/badge.svg?branch=master)](https://coveralls.io/github/titarenko/totlog?branch=master)
+[![main](https://github.com/lafayette/totlog/actions/workflows/main.yml/badge.svg)](https://github.com/lafayette/totlog/actions/workflows/main.yml)
+[![Coverage Status](https://coveralls.io/repos/github/lafayette/totlog/badge.svg?branch=master)](https://coveralls.io/github/lafayette/totlog?branch=master)
 
 ## How to use
 
