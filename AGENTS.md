@@ -20,7 +20,10 @@ other, adapting only syntax, tooling and formatting.
 
 - Modern syntax is fine, but stay inside the Node core API — no new dependencies.
 - Toolchain: ESLint 9 flat config (`eslint.config.mjs`), Mocha 10, `nyc`, `mock-require` 3.
-- CI lives in `.github/workflows/main.yml` (lint annotations, tests, coverage to Coveralls).
+- CI lives in `.github/workflows/main.yml` (lint annotations, tests, coverage to Coveralls). It
+  pins Node 24 on purpose: `node-version: latest` drifted onto Node 26, where mocha 10's bundled
+  yargs fails to load, so the test step produced no report and the job died on the CTRF step
+  instead of on the real error. Do not put `latest` back.
 
 ## Layout
 
