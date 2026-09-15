@@ -117,7 +117,7 @@ describe('appenders', function () {
       const instance = logstash({ url: 'udp://localhost:3000' })
       const message = { time: '2', level: 'debug', category: '3', message: '4' }
       instance(message)
-      const buffer = Buffer.from(JSON.stringify(message))
+      const buffer = Buffer.from(JSON.stringify(message) + '\n')
       socket.send.should.be.calledWith(buffer, 0, buffer.length, '3000', 'localhost')
     })
     it('should send messages thru tcp', function () {
