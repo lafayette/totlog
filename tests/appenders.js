@@ -101,6 +101,18 @@ describe('loggers', function () {
 			const create = () => mattermost({ })
 			create.should.throw('URL is required.')
 		})
+		it('should keep both ends of a long message', function () {
+			process.env.MAX_ERROR_MESSAGE_LENGTH = '40'
+			try {
+				const instance = mattermost({ url: 'https://chat.ololo.com/hooks/chpoken' })
+				const message = 'a'.repeat(50) + 'b'.repeat(50)
+				instance({ time: '1', level: 'error', category: '2', message })
+			} finally {
+				delete process.env.MAX_ERROR_MESSAGE_LENGTH
+			}
+			const { text } = JSON.parse(requestApi.write.firstCall.args[0])
+			text.should.containEql('a'.repeat(17) + '\n ... \n' + 'b'.repeat(16))
+		})
 	})
 	describe('logstash', function () {
 		let socket, logstash

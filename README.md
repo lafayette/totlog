@@ -1,6 +1,6 @@
 # totlog
 
-The only true log: (almost) zero dependencies, categories, colors, events for flexible support of additional appending logic. Bonus: slack, telegram, mattermost and logstash appenders. Extra bonus: (almost) everything is tested.
+The only true log: zero dependencies, categories, colors, events for flexible support of additional appending logic. Bonus: slack, telegram, mattermost and logstash appenders. Extra bonus: (almost) everything is tested.
 
 ## How to use
 
@@ -53,7 +53,9 @@ const logstashUdp = log.appenders.logstash({ url: 'udp://host:port' })
 `channel`, `username` and `icon` (an emoji name such as `:robot_face:`) are optional and override the
 defaults configured for the webhook.
 
-`telegram` and `mattermost` truncate the message to `MAX_MESSAGE_LENGTH` characters (700 by default).
+`telegram` and `mattermost` truncate the message to `MAX_ERROR_MESSAGE_LENGTH` characters (700 by
+default), keeping the first and the last half rather than just the beginning — for a long error the
+actual cause is usually at the end.
 
 ## Branches
 

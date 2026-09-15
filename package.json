@@ -30,9 +30,6 @@
     "url": "https://github.com/titarenko/totlog/issues"
   },
   "homepage": "https://github.com/titarenko/totlog#readme",
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
   "optionalDependencies": {
     "colors": "^1.1.2"
   },

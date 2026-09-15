@@ -4,7 +4,6 @@ const querystring = require('querystring')
 const dgram = require('dgram')
 const net = require('net')
 const { URL } = require('url')
-const truncate = require('lodash/truncate')
 
 const log = require('./')(__filename, true)
 
@@ -65,10 +64,7 @@ function telegram ({ botToken, chatId }) {
 	}
 
 	return function (ev) {
-		const truncatedMessage = truncate(ev.message, {
-			length: process.env.MAX_MESSAGE_LENGTH || 700,
-			omission: ' ...',
-		})
+		const truncatedMessage = truncate(ev.message)
 		const payload = JSON.stringify({
 			chat_id: chatId,
 			parse_mode: 'markdown',
@@ -116,10 +112,7 @@ function mattermost ({ url, channel, username, icon }) {
 	const transport = protocol === 'https:' ? https : http
 
 	return function (ev) {
-		const truncatedMessage = truncate(ev.message, {
-			length: process.env.MAX_MESSAGE_LENGTH || 700,
-			omission: ' ...',
-		})
+		const truncatedMessage = truncate(ev.message)
 		const payload = JSON.stringify({
 			channel: channel,
 			username: username,
@@ -225,4 +218,19 @@ function logstash ({ url }) {
 	process.on('SIGTERM', shutdownTcp)
 
 	return protocol === 'tcp://' ? tcp : udp
+}
+
+// keeps both ends of the message: the tail usually carries the actual cause
+function truncate (message) {
+	const length = Number(process.env.MAX_ERROR_MESSAGE_LENGTH) || 700
+	const omission = '\n ... \n'
+	const kept = length - omission.length
+
+	if (message.length <= length || kept <= 0) {
+		return message.slice(0, length)
+	}
+
+	const head = Math.ceil(kept / 2)
+
+	return `${message.slice(0, head)}${omission}${message.slice(head - kept)}`
 }
