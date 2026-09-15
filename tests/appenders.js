@@ -55,11 +55,15 @@ describe('appenders', function () {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': 48,
+          'Content-Length': 74,
         },
       })
       requestApi.on.should.be.calledWith('error')
-      const expectedPayload = JSON.stringify({ chat_id: 'ololo', text: '*1* `2` ```\n3\n```' })
+      const expectedPayload = JSON.stringify({
+        chat_id: 'ololo',
+        parse_mode: 'markdown',
+        text: '*1* \n`2` ```\n3\n```',
+      })
       requestApi.write.should.be.calledWith(expectedPayload)
       requestApi.end.should.be.called()
     })

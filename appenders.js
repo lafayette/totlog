@@ -71,7 +71,8 @@ function telegram ({ botToken, chatId }) {
     })
     const payload = JSON.stringify({
       chat_id: chatId,
-      text: `*${ev.time}* ${'`'}${ev.category}${'`'} ${'```\n'}${truncatedMessage}${'\n```'}`,
+      parse_mode: 'markdown',
+      text: `*${ev.time}* ${'\n`'}${ev.category}${'`'} ${'```\n'}${truncatedMessage}${'\n```'}`,
     })
 
     const request = https.request({
