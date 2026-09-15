@@ -5,8 +5,8 @@ Guidance for AI agents working in this repository.
 ## Project
 
 `totlog` is a minimal logger: categories, colors, and a `message` event that lets you plug in
-appenders. It is deliberately (almost) dependency-free — do not add runtime dependencies without
-asking first.
+appenders. It is deliberately (almost) dependency-free — `lodash` is the only runtime dependency, and
+`colors` is optional. Do not add more without asking first.
 
 ## Branches
 
@@ -40,9 +40,6 @@ npm install
 npm run lint
 npm test
 ```
-
-Known issue: the two `logstash` specs in `tests/appenders.js` fail on this branch — they were never
-updated after logstash messages gained a trailing newline. Unrelated to any new work.
 
 ## Code style
 
