@@ -1,12 +1,14 @@
 const https = require('https')
+const http = require('http')
 const querystring = require('querystring')
 const dgram = require('dgram')
 const net = require('net')
+const { URL } = require('url')
 const truncate = require('lodash/truncate')
 
 const log = require('./')(__filename, true)
 
-module.exports = { slack, telegram, logstash }
+module.exports = { slack, telegram, mattermost, logstash }
 
 function slack ({ token, channel, icon }) {
   if (!token) {
@@ -95,6 +97,60 @@ function telegram ({ botToken, chatId }) {
 
     function handlError (error) {
       log.error(`failed to send message to telegram due to ${error.stack}`)
+    }
+  }
+}
+
+function mattermost ({ url, channel, username, icon }) {
+  if (!url) {
+    throw new Error('URL is required.')
+  }
+
+  const { protocol, hostname, port, pathname, search } = new URL(url)
+
+  if (protocol != 'http:' && protocol != 'https:') {
+    throw new Error('Only HTTP and HTTPS protocols are supported.')
+  }
+
+  const transport = protocol === 'https:' ? https : http
+
+  return function (ev) {
+    const truncatedMessage = truncate(ev.message, {
+      length: process.env.MAX_MESSAGE_LENGTH || 700,
+      omission: ' ...',
+    })
+    const payload = JSON.stringify({
+      channel: channel,
+      username: username,
+      icon_emoji: icon,
+      text: `**${ev.time}** ${'`'}${ev.category}${'`'}${'\n```\n'}${truncatedMessage}${'\n```'}`,
+    })
+
+    const request = transport.request({
+      hostname: hostname,
+      port: port || null,
+      path: `${pathname}${search}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    }, handleResponse)
+
+    request.on('error', handlError)
+    request.write(payload)
+    request.end()
+
+    function handleResponse (response) {
+      if (response.statusCode !== 200) {
+        handlError(new Error(String(response.statusCode)))
+      }
+      response.on('error', handlError)
+      response.resume()
+    }
+
+    function handlError (error) {
+      log.error(`failed to send message to mattermost due to ${error.stack}`)
     }
   }
 }
