@@ -41,6 +41,10 @@ npm run lint
 npm test
 ```
 
+This branch has no CI. Its `.travis.yml` was removed: travis-ci.org has been shut down for years, so
+the file described a pipeline that could never run, and `master`'s GitHub Actions workflow is scoped
+to `master`. Run the linter and the suite locally before committing.
+
 ## Code style
 
 Enforced by ESLint — run the linter instead of guessing.
