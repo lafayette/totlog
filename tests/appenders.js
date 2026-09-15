@@ -68,6 +68,40 @@ describe('loggers', function () {
 			requestApi.end.should.be.called()
 		})
 	})
+	describe('mattermost', function () {
+		let request, requestApi, mattermost
+		beforeEach(function () {
+			requestApi = { on: sinon.spy(), write: sinon.spy(), end: sinon.spy() }
+			request = sinon.spy(() => requestApi)
+			mockRequire('https', { request })
+			mattermost = mockRequire.reRequire('../appenders').mattermost
+		})
+		afterEach(function () {
+			mockRequire.stopAll()
+		})
+		it('should send messages', function () {
+			const instance = mattermost({ url: 'https://chat.ololo.com/hooks/chpoken' })
+			instance({ time: '1', level: 'error', category: '2', message: '3' })
+			request.should.be.calledWith({
+				hostname: 'chat.ololo.com',
+				port: null,
+				path: '/hooks/chpoken',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Content-Length': 33,
+				},
+			})
+			requestApi.on.should.be.calledWith('error')
+			const expectedPayload = JSON.stringify({ text: '**1** `2`\n```\n3\n```' })
+			requestApi.write.should.be.calledWith(expectedPayload)
+			requestApi.end.should.be.called()
+		})
+		it('should require url', function () {
+			const create = () => mattermost({ })
+			create.should.throw('URL is required.')
+		})
+	})
 	describe('logstash', function () {
 		let socket, logstash
 		beforeEach(function () {

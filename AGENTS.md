@@ -62,6 +62,8 @@ event (`{ time, level, category, message, content }`).
 - Use the core `http`, `https`, `net` and `dgram` modules directly — no HTTP client libraries.
 - Never throw from the returned handler. Report failures through the module's own silent logger
   (`log.error(...)`) so that logging can never break the host application.
+- Drain the response (`response.resume()`), otherwise the socket is never released and a short-lived
+  process will not exit.
 - Truncate chat messages with `MAX_MESSAGE_LENGTH` (default 700), the way `telegram` and
   `mattermost` do.
 - Export it from `module.exports` in `appenders.js` and cover it in `tests/appenders.js` by mocking
