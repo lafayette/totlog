@@ -1,0 +1,83 @@
+# AGENTS.md
+
+Guidance for AI agents working in this repository.
+
+## Project
+
+`totlog` is a minimal logger: categories, colors, and a `message` event that lets you plug in
+appenders. It is deliberately (almost) dependency-free — do not add runtime dependencies without
+asking first.
+
+## Branches
+
+- `master` — main line, targets current Node.js. This is the branch you are on.
+- `legacy` — maintenance line for Node.js 8.
+
+Keep the two branches feature-equivalent: when you add or change an appender on one, port it to the
+other, adapting only syntax, tooling and formatting.
+
+## This branch: current Node.js
+
+- Modern syntax is fine, but stay inside the Node core API — no new dependencies.
+- Toolchain: ESLint 9 flat config (`eslint.config.mjs`), Mocha 10, `nyc`, `mock-require` 3.
+- CI lives in `.github/workflows/main.yml` (lint annotations, tests, coverage to Coveralls).
+
+## Layout
+
+| File | Purpose |
+| --- | --- |
+| `index.js` | logger factory, console output, `message` event emitter |
+| `appenders.js` | built-in appenders: `slack`, `telegram`, `mattermost`, `logstash` |
+| `stream.js` | `Writable` stream forwarding chunks to a logger |
+| `tests/` | Mocha specs, one file per source file |
+
+## Commands
+
+```bash
+npm install
+npm run lint
+npm run lint-fix
+npm test
+npm run test-coverage
+```
+
+`tests/index.js` derives the log category from the working directory name, so the checkout must be
+named `totlog` for those specs to pass.
+
+Known issues, unrelated to any new work:
+
+- the `logstash` udp spec in `tests/appenders.js` fails — it was not updated after udp messages
+  gained a trailing newline;
+- `logstash` builds packets with the deprecated `new Buffer(...)` instead of `Buffer.from(...)`.
+
+## Code style
+
+Enforced by ESLint (`@stylistic`) — run the linter instead of guessing.
+
+- Two spaces for indentation, no semicolons, single quotes, trailing commas in multiline literals.
+- Space before function parens: `function slack (options) {`.
+- `function` declarations for exported units, arrows for callbacks.
+
+## Appender conventions
+
+An appender is a factory that validates its options and returns `function (ev)` handling a single log
+event (`{ time, level, category, message, content }`).
+
+- Validate eagerly in the factory and throw `new Error('X is required.')` for missing options.
+- Use the core `http`, `https`, `net` and `dgram` modules directly — no HTTP client libraries.
+- Never throw from the returned handler. Report failures through the module's own silent logger
+  (`log.error(...)`) so that logging can never break the host application.
+- Drain the response (`response.resume()`), otherwise the socket is never released and a short-lived
+  process will not exit.
+- Truncate chat messages with `MAX_MESSAGE_LENGTH` (default 700), the way `telegram` and
+  `mattermost` do.
+- Export it from `module.exports` in `appenders.js` and cover it in `tests/appenders.js` by mocking
+  `https` with `mock-require`.
+
+## Git rules
+
+- Local commits and `git fetch` are fine.
+- **Never change anything on a remote without the user's explicit consent for that specific action.**
+  This covers `git push` (including `--force`), creating or deleting remote branches and tags,
+  opening or merging pull requests, and publishing to npm. Ask every time — consent for one action is
+  not consent for the next.
