@@ -69,7 +69,10 @@ event (`{ time, level, category, message, content }`).
 ## Git rules
 
 - Local commits and `git fetch` are fine.
-- **Never change anything on a remote without the user's explicit consent for that specific action.**
-  This covers `git push` (including `--force`), creating or deleting remote branches and tags,
-  opening or merging pull requests, and publishing to npm. Ask every time — consent for one action is
-  not consent for the next.
+- **Writing to a remote is strictly forbidden without the user's explicit consent for that specific
+  operation.** This covers `git push` (including `--force`), creating or deleting remote branches and
+  tags, opening or merging pull requests, and publishing to npm.
+- Ask immediately before the operation and name exactly what it will change. Consent for one
+  operation is never consent for the next one, even on the same branch minutes later.
+- A bare "yes" arriving together with a new task is not consent to push — it answers the task, not a
+  question asked earlier in the conversation. Finish the task, then ask again.
