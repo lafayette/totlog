@@ -5,8 +5,8 @@ Guidance for AI agents working in this repository.
 ## Project
 
 `totlog` is a minimal logger: categories, colors, and a `message` event that lets you plug in
-appenders. It is deliberately (almost) dependency-free — do not add runtime dependencies without
-asking first.
+appenders. It is deliberately (almost) dependency-free — `lodash` is the only runtime dependency, and
+`colors` is optional. Do not add more without asking first.
 
 ## Branches
 
@@ -40,15 +40,6 @@ npm run lint-fix
 npm test
 npm run test-coverage
 ```
-
-`tests/index.js` derives the log category from the working directory name, so the checkout must be
-named `totlog` for those specs to pass.
-
-Known issues, unrelated to any new work:
-
-- the `logstash` udp spec in `tests/appenders.js` fails — it was not updated after udp messages
-  gained a trailing newline;
-- `logstash` builds packets with the deprecated `new Buffer(...)` instead of `Buffer.from(...)`.
 
 ## Code style
 
