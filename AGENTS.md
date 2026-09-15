@@ -5,8 +5,8 @@ Guidance for AI agents working in this repository.
 ## Project
 
 `totlog` is a minimal logger: categories, colors, and a `message` event that lets you plug in
-appenders. It is deliberately (almost) dependency-free — `lodash` is the only runtime dependency, and
-`colors` is optional. Do not add more without asking first.
+appenders. It has no runtime dependencies at all (`colors` is optional) and should stay that way —
+do not add one without asking first.
 
 ## Branches
 
@@ -63,8 +63,9 @@ event (`{ time, level, category, message, content }`).
   (`log.error(...)`) so that logging can never break the host application.
 - Drain the response (`response.resume()`), otherwise the socket is never released and a short-lived
   process will not exit.
-- Truncate chat messages with `MAX_MESSAGE_LENGTH` (default 700), the way `telegram` and
-  `mattermost` do.
+- Truncate chat messages with the shared `truncate` helper, which honours `MAX_ERROR_MESSAGE_LENGTH`
+  (default 700) and keeps both ends of the message, the way `telegram` and `mattermost` do. Head-only
+  truncation loses the tail, which is where the actual cause of a long error usually sits.
 - Export it from `module.exports` in `appenders.js` and cover it in `tests/appenders.js` by mocking
   `https` with `mock-require`.
 
