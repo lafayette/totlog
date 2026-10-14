@@ -14,6 +14,7 @@ function createLogger (category, silent) {
 	return {
 		error: (...args) => log(silent, 'error', colors && colors.red, category, ...args),
 		warn: (...args) => log(silent, 'warn', colors && colors.yellow, category, ...args),
+		info: (...args) => log(silent, 'info', colors && colors.green, category, ...args),
 		debug: (...args) => log(silent, 'debug', null, category, ...args),
 	}
 }
