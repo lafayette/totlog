@@ -35,6 +35,13 @@ describe('log', function () {
       consoleLog.should.be.calledWith(message)
     })
   })
+  describe('info', function () {
+    it('should use util.format for arg processing', function () {
+      log(__filename).info('obj %j', { a: 4 })
+      const message = `${time.toISOString().white} ${'info'.green} ${category.cyan} obj {"a":4}`
+      consoleLog.should.be.calledWith(message)
+    })
+  })
   describe('debug', function () {
     it('should use util.format for arg processing', function () {
       log(__filename).debug('obj %j', { a: 3 })

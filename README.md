@@ -18,6 +18,9 @@ log.debug('anything that %s could pass to %s', 'you', 'util.format')
 // - formatted message
 ```
 
+Levels are `error`, `warn`, `info` and `debug`. `error` goes to `console.error`, the rest to
+`console.log`; every level is emitted as a `message` event with its name in `message.level`.
+
 ## Advanced
 
 `log.js`
